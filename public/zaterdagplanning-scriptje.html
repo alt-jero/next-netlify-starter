@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<script type="text/javascript">
+let parsedInputs = [];
+
+function runConversion() {
+let input = document.getElementById('inputCsv').value;
+parsedInputs=input
+	.split('\n')
+	.map(l => l
+		.split(',')
+		.map(f => 
+			f.trim().indexOf('"')===0
+			? f.trim().slice(1,-1)
+			: f.trim()
+		)
+	);
+let headerline = parsedInputs[0];
+
+// Add header line fields to selector
+let selectorField = document.getElementById('fields');
+while (selectorField.options.length > 0) {                
+        selectorField.remove(0);
+    }  
+const defaultSelections = ['Trip Number', 'Arrival', 'End'];
+headerline.forEach(field => {
+	let option = document.createElement('option');
+	option.text = field;
+	if(defaultSelections.includes(field)) option.selected = true;
+	selectorField.add(option);
+});
+
+selectFieldsChanged();
+
+}
+
+function selectFieldsChanged() {
+let selector = document.getElementById('fields');
+let selected = Array.from(selector.selectedOptions).map(option => option.index);
+
+console.log(selected);
+
+let outputElement = document.getElementById('result');
+
+let outputLines = parsedInputs.map(line => 
+	line
+	.filter((field, index) => selected.includes(index))
+	.map(field => {
+		if(!field.match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/i)) return field;
+		try {
+			const date = new Date(field)
+			const hours = `${date.getHours()}`;
+			const minutes = `${date.getMinutes()}`;
+			return `${hours.padStart(2,'0')}:${minutes.padStart(2,'0')}`;
+		} catch (e) {
+			console.log(e);
+			return field;
+		}
+		
+	})
+	.join('\t'));
+
+outputElement.innerHTML = outputLines.join('\n');
+}
+</script>
+</head>
+<body>
+<p>Plak hier hetgeen wat je uit de R+ Console hebt gekopiëerd...</p>
+<textarea rows="15" cols="100" id="inputCsv" onchange="runConversion()"></textarea>
+<br>
+<button onclick="runConversion()">Convert</button>
+<br>
+<label for="fields">Kies welke velden je in het resultaat wil hebben</label>
+<select name="fields" id="fields" multiple onchange="selectFieldsChanged()">
+	
+</select>
+<textarea id="result" cols="100" rows="15">
+Hier komt het resultaat.
+</textarea>
+</body>
+</html>
