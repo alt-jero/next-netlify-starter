@@ -6,23 +6,32 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 </script>
 </head>
 <body>
+<p>Voor QR codes voor het device gebruik beide velden én de checkbox.</p>
+<p>Verander liefst je wachtwoord in iets dat nergens anders wordt gebruikt alvorens het in een QR code te verwerken, want IEDEREEN die mogelijk je QR code scant, kan je wachtwoord zien! Let dus ook goed op hoe je met je QR omgaat!</p>
+<p></p>
+<p>Voor andere QR codes, experimenteer of vraag Rumble.</p>
 <input type="text" id="line1">
 <input type="password" id="line2">
+<input type="checkbox" id="addnewline" name="addnewline" value="true">
+<label for="addnewline">Aanvinken voor QR om met device in te loggen.</label><br>
 <div id="qrcode" style="position: absolute; left: 35vw; top: 25vh;"></div>
 <script type="text/javascript">
 const lineElements = [
 	document.getElementById('line1'),
 	document.getElementById('line2'),
 ];
-
+const newLineElement = document.getElementById('addnewline');
 const outputElement = document.getElementById('qrcode');
 
 function updateCode() {
 	// Clear
 	outputElement.innerHTML = '';
 
+        // Check if we need to add a new line
+        const newLine = newLineElement.checked ? '\n' : '';
+
 	//Fields
-	const outputText = lineElements.map(el => el.value).join('\t') + '\n';
+	const outputText = lineElements.map(el => el.value).join('\t') + newLine;
 
 new QRCode(document.getElementById("qrcode"), {
     text: outputText,
